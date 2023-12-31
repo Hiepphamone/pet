@@ -1,4 +1,3 @@
-wait(10)
 getgenv().diamonds = 500000
 getgenv().username = "TOPnuppp"
 repeat wait(1) until game.Players
