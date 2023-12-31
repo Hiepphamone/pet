@@ -1,0 +1,90 @@
+wait(10)
+getgenv().diamonds = 500000
+getgenv().username = "TOPnuppp"
+repeat wait(1) until game.Players
+repeat wait(1) until game.Players.LocalPlayer
+repeat wait(1) until game.ReplicatedStorage
+repeat wait(1) until game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+repeat wait(1) until game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main")
+local vu = game:GetService("VirtualUser")
+local plr = game.Players.LocalPlayer
+local Client = require(game.ReplicatedStorage.Library.Client)
+function dbuoi()
+    if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - CFrame.new(214.46041870117188, 27.29428482055664, -588.5107421875).Position).Magnitude > 10 then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(214.46041870117188, 27.29428482055664, -588.5107421875)
+    end
+    for i,v in pairs(game:GetService("Workspace")["__THINGS"].Orbs:GetChildren()) do
+        v.CanCollide = false
+        v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,0,0)
+    end
+    
+    for i,v in pairs(game:GetService("Workspace")["__THINGS"].Lootbags:GetDescendants()) do
+        if v:IsA("MeshPart") then
+            v.CanCollide = false
+            v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,0,0)
+        end
+    end
+end
+function jump()
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, 32, false, game)
+    wait(4)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, 32, false, game)
+end
+function attack()
+    local a = {}
+    for i,v in pairs(game:GetService("Workspace")["__THINGS"].Breakables:GetChildren()) do
+        for i1,v1 in pairs(v:GetChildren()) do
+            if (v1.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 60 and #a < 2 then
+                return v.Name
+            end
+        end
+    end
+end
+
+function getcoin() 
+    local a = Client.Save.Get()
+    for i,v in pairs(a.Inventory.Currency) do
+        if type(v) == "table" and v.id == "Diamonds" then
+            return {v._am,i}
+        end
+    end
+    return 0
+end
+
+function container()
+    if getcoin()[1] >= getgenv().diamonds + 10000 then
+        -- 147.03858947753906, 23.593482971191406, -349.0108337402344
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(147.03858947753906, 23.593482971191406, -349.0108337402344)
+        wait(2)
+        local args = {
+            [1] = getgenv().username,
+            [2] = "asdasdsd",
+            [3] = "Currency",
+            [4] = getcoin()[2],
+            [5] = getgenv().diamonds
+        }
+        game:GetService("ReplicatedStorage").Network:FindFirstChild("Mailbox: Send"):InvokeServer(unpack(args))        
+    else
+        dbuoi()
+    end
+end
+
+spawn(function()
+    while true do wait()
+        pcall(function()
+            local tickm = tick()
+            repeat wait()
+            until tick() - tickm >= 30
+            jump()
+        end)
+    end
+end)
+game:GetService("RunService").Heartbeat:Connect(function()
+    spawn(function()
+        game:GetService("ReplicatedStorage").Network.Breakables_PlayerDealDamage:FireServer(attack())
+    end)
+end)
+
+while true do wait(1)
+    pcall(container)
+end
