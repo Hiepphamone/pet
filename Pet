@@ -1,3 +1,4 @@
+wait(10)
 getgenv().diamonds = 500000
 getgenv().username = "TOPnuppp"
 repeat wait(1) until game.Players
@@ -40,7 +41,7 @@ function attack()
     end
 end
 
-function getcoin() 
+function getcoin()
     local a = Client.Save.Get()
     for i,v in pairs(a.Inventory.Currency) do
         if type(v) == "table" and v.id == "Diamonds" then
@@ -48,6 +49,14 @@ function getcoin()
         end
     end
     return 0
+end
+
+function getflag()
+    for i,v in pairs(Client.InventoryCmds.State().container._store._byType.Misc._byUID) do
+        if v._data.id == "Diamonds Flag" then
+            return {v._data.id,i}
+        end
+    end
 end
 
 function container()
@@ -82,6 +91,14 @@ game:GetService("RunService").Heartbeat:Connect(function()
     spawn(function()
         game:GetService("ReplicatedStorage").Network.Breakables_PlayerDealDamage:FireServer(attack())
     end)
+end)
+
+spawn(function()
+    while true do wait(60)
+        pcall(function()
+            Client.ZoneFlagCmds.Consume(getflag()[1],getflag()[2])
+        end)
+    end
 end)
 
 while true do wait(1)
